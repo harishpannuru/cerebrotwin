@@ -120,6 +120,7 @@ streamlit run src/app/dashboard.py
 cerebrotwin/
 ├── LICENSE                          # MIT License
 ├── README.md                        # This file
+├── .python-version                  # Python 3.11 runtime pin
 ├── requirements.txt                 # Python dependencies
 ├── config.yaml                      # Pipeline configuration
 ├── main.py                          # CLI entry point (train / evaluate)
@@ -141,6 +142,7 @@ cerebrotwin/
 │   ├── mean_baseline.joblib
 │   ├── feature_names.joblib
 │   ├── target_names.joblib
+│   ├── eval_dict.joblib             # Cached GroupKFold evaluation results
 │   └── evaluation_results.csv
 └── src/
     ├── __init__.py
