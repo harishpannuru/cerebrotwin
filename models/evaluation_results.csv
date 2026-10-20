@@ -1,0 +1,4 @@
+Model,Validation,pct_mca_drop (MAE %),pct_mca_drop (RMSE %),pct_mca_drop (R²),mca_nadir_cms (MAE cm/s),mca_nadir_cms (RMSE cm/s),recovery_time_s (MAE s),cumulative_deficit (MAE),overall_trajectory (RMSE %)
+Mean Baseline (Model 0),GroupKFold_5,10.746,11.943,-0.01,8.331,9.882,14.849,3.646,8.52
+Ridge Regression (Model 1),GroupKFold_5,5.238,6.475,0.703,6.353,7.651,5.684,1.565,4.693
+XGBoost Digital Twin (Model 2),GroupKFold_5,4.816,6.115,0.735,8.053,9.044,5.351,1.534,4.475

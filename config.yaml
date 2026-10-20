@@ -1,0 +1,48 @@
+project:
+  name: "CerebroTwin"
+  version: "1.0.0"
+  description: "Personalized Digital Twin for Forecasting Orthostatic Cerebral Blood-Flow-Velocity Instability in T2D"
+
+data:
+  mode: "synthetic"  # "synthetic" or "physionet"
+  raw_physionet_dir: "data/raw/physionet"
+  synthetic_dir: "data/synthetic"
+  cache_dir: "data/cache"
+  n_subjects: 39
+  n_t2d: 20
+  n_control: 19
+  sampling_rate_hz: 50
+  window_pre_stand_s: 60
+  window_post_stand_s: 60
+
+physiology:
+  mcav_baseline_range: [45, 75]  # cm/s, normal MCA blood-flow velocity range
+  t2d_mcav_drop_pct: [15, 40]    # T2D subjects drop more
+  control_mcav_drop_pct: [5, 20] # Controls drop less
+  recovery_time_normal_s: 15
+  nadir_time_range_s: [5, 15]
+  hr_baseline_range: [60, 90]
+  sbp_baseline_range: [110, 160]
+  dbp_baseline_range: [65, 95]
+  map_baseline_range: [80, 120]
+  resp_rate_range: [12, 20]
+  etco2_range: [35, 45]
+
+model:
+  n_trajectory_knots: 13  # 0, 5, 10, ..., 60
+  trajectory_times: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+  quantiles: [0.05, 0.5, 0.95]
+  random_state: 42
+  xgb_params:
+    n_estimators: 200
+    max_depth: 4
+    learning_rate: 0.05
+    reg_alpha: 1.0
+    reg_lambda: 2.0
+    subsample: 0.8
+    colsample_bytree: 0.8
+  ridge_alpha: 10.0
+
+dashboard:
+  title: "CerebroTwin: Digital Twin for Orthostatic Cerebral Flow Velocity"
+  port: 8501
