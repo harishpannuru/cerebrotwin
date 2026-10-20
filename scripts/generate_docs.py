@@ -18,6 +18,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = PROJECT_ROOT / "docs"
 DOCS_DIR.mkdir(parents=True, exist_ok=True)
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from reportlab.lib.pagesizes import LETTER, landscape
 from reportlab.lib.units import inch, cm
@@ -51,261 +53,7 @@ RED_ACC     = HexColor("#EF5350")
 # ═══════════════════════════════════════════════════════════════════
 # PART 1:  Architecture Diagram (single-page landscape PDF)
 # ═══════════════════════════════════════════════════════════════════
-
-def _rounded_rect(c, x, y, w, h, r, fill_color, stroke_color=None, stroke_width=1):
-    """Draw a rounded rectangle on the canvas."""
-    c.saveState()
-    c.setFillColor(fill_color)
-    if stroke_color:
-        c.setStrokeColor(stroke_color)
-        c.setLineWidth(stroke_width)
-    else:
-        c.setStrokeColor(fill_color)
-        c.setLineWidth(0)
-    c.roundRect(x, y, w, h, r, fill=1, stroke=1 if stroke_color else 0)
-    c.restoreState()
-
-
-def _draw_text_block(c, x, y, w, h, lines, font_size=8, color=WHITE, bold_first=True, font="Helvetica"):
-    """Centre-align a list of text lines inside a box area."""
-    c.saveState()
-    c.setFillColor(color)
-    total_h = len(lines) * (font_size + 3)
-    start_y = y + h / 2 + total_h / 2 - font_size
-    for i, line in enumerate(lines):
-        fn = f"{font}-Bold" if (bold_first and i == 0) else font
-        c.setFont(fn, font_size)
-        tw = c.stringWidth(line, fn, font_size)
-        c.drawString(x + (w - tw) / 2, start_y - i * (font_size + 3), line)
-    c.restoreState()
-
-
-def _arrow(c, x1, y1, x2, y2, color=ACCENT, width=1.5):
-    """Draw a simple arrow line."""
-    c.saveState()
-    c.setStrokeColor(color)
-    c.setLineWidth(width)
-    c.setLineCap(1)
-    c.line(x1, y1, x2, y2)
-    # arrowhead
-    import math
-    angle = math.atan2(y2 - y1, x2 - x1)
-    arrow_len = 8
-    c.line(x2, y2,
-           x2 - arrow_len * math.cos(angle - math.pi / 6),
-           y2 - arrow_len * math.sin(angle - math.pi / 6))
-    c.line(x2, y2,
-           x2 - arrow_len * math.cos(angle + math.pi / 6),
-           y2 - arrow_len * math.sin(angle + math.pi / 6))
-    c.restoreState()
-
-
-def build_architecture_pdf(output_path: Path):
-    """Build the architecture diagram PDF."""
-    W, H = landscape(LETTER)  # 792 x 612
-    c = Canvas(str(output_path), pagesize=landscape(LETTER))
-    c.setTitle("CerebroTwin – Architecture Diagram")
-
-    # Background
-    c.setFillColor(DARK_NAVY)
-    c.rect(0, 0, W, H, fill=1, stroke=0)
-
-    # Title bar
-    _rounded_rect(c, 20, H - 60, W - 40, 45, 6, DEEP_BLUE, ACCENT, 1.5)
-    c.setFillColor(WHITE)
-    c.setFont("Helvetica-Bold", 18)
-    title = "CerebroTwin  —  Physiological Digital Twin Architecture"
-    c.drawCentredString(W / 2, H - 44, title)
-
-    # ── ROW 1: Inputs (y ≈ 470) ──
-    row1_y = H - 145
-    bw, bh = 165, 75
-
-    # Box 1: Clinical Inputs
-    x1 = 30
-    _rounded_rect(c, x1, row1_y, bw, bh, 8, DEEP_BLUE, TEAL, 1.5)
-    _draw_text_block(c, x1, row1_y, bw, bh, [
-        "Clinical Inputs",
-        "Age · T2D Status · HbA1c",
-        "HTN · Medications",
-        "Baseline HRV / BP",
-    ], 8)
-
-    # Box 2: Continuous Dynamic Signals
-    x2 = 220
-    _rounded_rect(c, x2, row1_y, bw + 10, bh, 8, DEEP_BLUE, TEAL, 1.5)
-    _draw_text_block(c, x2, row1_y, bw + 10, bh, [
-        "Continuous Dynamic Signals",
-        "ECG / HR  ·  Arterial BP",
-        "Respiration  ·  EtCO₂",
-    ], 8)
-
-    # Box 3: Preprocessing
-    x3 = 425
-    _rounded_rect(c, x3, row1_y, bw, bh, 8, MID_BLUE, ACCENT, 1.5)
-    _draw_text_block(c, x3, row1_y, bw, bh, [
-        "Preprocessing &",
-        "Alignment Engine",
-        "Beat-to-beat sync",
-        "Normalization · QC",
-    ], 8)
-
-    # Arrows row 1 → preprocessing
-    mid1 = row1_y + bh / 2
-    _arrow(c, x1 + bw, mid1, x3, mid1)
-    _arrow(c, x2 + bw + 10, mid1, x3, mid1)
-
-    # ── ROW 2: Core engine (y ≈ 350) ──
-    row2_y = H - 255
-    core_w = 220
-
-    # CerebroTwin Core
-    x4 = 30
-    _rounded_rect(c, x4, row2_y, core_w, 80, 10, HexColor("#1A3D5C"), ACCENT, 2)
-    _draw_text_block(c, x4, row2_y, core_w, 80, [
-        "CerebroTwin",
-        "Physiological State Core",
-        "Baroreflex · CA Index",
-        "ΔHR/Δt · ΔMAP/Δt · CO₂ reactivity",
-    ], 8.5)
-
-    _arrow(c, x3 + bw / 2, row1_y, x4 + core_w / 2, row2_y + 80, ACCENT)
-
-    # ML Forecasting Engine
-    ml_x = 290
-    ml_w = 280
-    _rounded_rect(c, ml_x, row2_y, ml_w, 80, 10, HexColor("#1A3D5C"), ORANGE, 2)
-    c.saveState()
-    c.setFillColor(WHITE)
-    c.setFont("Helvetica-Bold", 9)
-    c.drawCentredString(ml_x + ml_w / 2, row2_y + 65, "Multi-Target ML Forecasting Engine")
-    c.restoreState()
-
-    # Three sub-boxes inside ML box
-    sub_w = 80
-    sub_h = 40
-    sub_y = row2_y + 8
-    models = [
-        ("Model 0", "Mean Baseline", GREEN_ACC),
-        ("Model 1", "Ridge (L2)", ACCENT),
-        ("Model 2", "Quantile XGB", ORANGE),
-    ]
-    for i, (name, desc, clr) in enumerate(models):
-        sx = ml_x + 10 + i * (sub_w + 10)
-        _rounded_rect(c, sx, sub_y, sub_w, sub_h, 5, NAVY, clr, 1.5)
-        _draw_text_block(c, sx, sub_y, sub_w, sub_h, [name, desc], 7, clr)
-
-    _arrow(c, x4 + core_w, row2_y + 40, ml_x, row2_y + 40, ACCENT)
-
-    # ── ROW 3: Outputs (y ≈ 220) ──
-    row3_y = H - 380
-    out_w = 240
-
-    # Output trajectory box
-    ox = 30
-    _rounded_rect(c, ox, row3_y, out_w, 90, 10, HexColor("#0A2540"), GREEN_ACC, 2)
-    _draw_text_block(c, ox, row3_y, out_w, 90, [
-        "0–60s MCA Blood-Flow Velocity",
-        "Trajectory Output",
-        "─────────────────────",
-        "Nadir (MCAv_min)  ·  Flow Deficit",
-        "Recovery Classification",
-        "90% Prediction Intervals",
-    ], 8, GREEN_ACC)
-
-    _arrow(c, ml_x + ml_w / 2, row2_y, ox + out_w / 2, row3_y + 90, GREEN_ACC)
-
-    # Ground Truth Validation Gate
-    gt_x = 310
-    gt_w = 220
-    _rounded_rect(c, gt_x, row3_y, gt_w, 90, 10, HexColor("#3E1A1A"), RED_ACC, 2)
-    _draw_text_block(c, gt_x, row3_y, gt_w, 90, [
-        "Ground Truth Validation Gate",
-        "─────────────────────",
-        "TCD MCAv (Transcranial Doppler)",
-        "Strictly isolated from",
-        "runtime model inputs",
-        "GroupKFold Subject Split",
-    ], 8, RED_ACC)
-
-    # dashed validation arrow
-    c.saveState()
-    c.setStrokeColor(RED_ACC)
-    c.setLineWidth(1.5)
-    c.setDash(4, 3)
-    c.line(ox + out_w, row3_y + 45, gt_x, row3_y + 45)
-    c.restoreState()
-
-    # ── ROW 4: Clinician Dashboard (y ≈ 100) ──
-    row4_y = H - 500
-    dash_w = 540
-    dash_x = 30
-    _rounded_rect(c, dash_x, row4_y, dash_w, 85, 10, NAVY, PURPLE, 2)
-    _draw_text_block(c, dash_x, row4_y, dash_w, 85, [
-        "Clinician Dashboard  &  Counterfactual What-If Simulator",
-        "──────────────────────────────────────────",
-        "Interactive Streamlit UI  ·  Patient Replay  ·  SHAP Feature Waterfall",
-        "\"What if HbA1c = 7.5?\"  ·  \"What if β-blocker added?\"  ·  Trajectory comparison overlay",
-    ], 9, PURPLE)
-
-    _arrow(c, ox + out_w / 2, row3_y, dash_x + dash_w / 4, row4_y + 85, PURPLE)
-    _arrow(c, gt_x + gt_w / 2, row3_y, dash_x + dash_w * 3 / 4, row4_y + 85, PURPLE)
-
-    # ── Legend / Key  ──
-    legend_x = 610
-    legend_y = H - 145
-    _rounded_rect(c, legend_x, legend_y - 270, 165, 330, 8, NAVY, HexColor("#555555"), 1)
-    c.saveState()
-    c.setFillColor(WHITE)
-    c.setFont("Helvetica-Bold", 9)
-    c.drawString(legend_x + 10, legend_y + 47, "Legend")
-    c.setFont("Helvetica", 7.5)
-
-    items = [
-        (TEAL, "Clinical / Signal Input"),
-        (ACCENT, "Preprocessing / Linear"),
-        (ORANGE, "XGBoost / ML Engine"),
-        (GREEN_ACC, "Prediction Output"),
-        (RED_ACC, "Validation (TCD)"),
-        (PURPLE, "Clinician Interface"),
-    ]
-    for i, (clr, label) in enumerate(items):
-        y_pos = legend_y + 25 - i * 22
-        c.setFillColor(clr)
-        c.roundRect(legend_x + 12, y_pos - 4, 12, 12, 2, fill=1, stroke=0)
-        c.setFillColor(LIGHT_GRAY)
-        c.drawString(legend_x + 30, y_pos - 1, label)
-    c.restoreState()
-
-    # Metrics badge
-    badge_y = legend_y - 120
-    _rounded_rect(c, legend_x + 5, badge_y, 155, 70, 6, DEEP_BLUE, ACCENT, 1)
-    _draw_text_block(c, legend_x + 5, badge_y, 155, 70, [
-        "Validation Metrics",
-        "R² = 0.735",
-        "MAE = 4.816%",
-        "RMSE = 4.475%",
-    ], 8.5, ACCENT)
-
-    # Dataset badge
-    ds_y = badge_y - 80
-    _rounded_rect(c, legend_x + 5, ds_y, 155, 65, 6, DEEP_BLUE, TEAL, 1)
-    _draw_text_block(c, legend_x + 5, ds_y, 155, 65, [
-        "PhysioNet Dataset",
-        "Cerebral Vasoregulation",
-        "in Elderly with Stroke",
-    ], 8, TEAL)
-
-    # Footer
-    c.saveState()
-    c.setFillColor(HexColor("#555555"))
-    c.setFont("Helvetica", 7)
-    c.drawCentredString(W / 2, 15, "CerebroTwin © 2026 Harish Pannuru, Pavan Sai Krishna, Girish Chandra Kovuru  —  IIITDM Kancheepuram")
-    c.restoreState()
-
-    c.showPage()
-    c.save()
-    print(f"  ✓ Architecture diagram → {output_path}")
+from scripts.generate_architecture import build_architecture_pdf
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -652,23 +400,29 @@ def build_presentation_pdf(output_path: Path):
 # ═══════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     arch_path = DOCS_DIR / "CerebroTwin_Architecture_Diagram.pdf"
-    pres_path = DOCS_DIR / "CerebroTwin_Project_Presentation.pdf"
 
     print("Generating CerebroTwin documentation PDFs …")
     build_architecture_pdf(arch_path)
-    build_presentation_pdf(pres_path)
 
-    # Verify files exist
-    ok = True
-    for p in [arch_path, pres_path]:
-        if p.exists() and p.stat().st_size > 0:
-            print(f"  ✓ Verified: {p}  ({p.stat().st_size:,} bytes)")
-        else:
-            print(f"  ✗ MISSING or EMPTY: {p}")
-            ok = False
-
-    if ok:
-        print("\n✅ All documentation PDFs generated and verified successfully.")
+    # Check for user-provided presentation files in docs/
+    user_pres_files = [
+        p for p in DOCS_DIR.glob("*Presentation*.pdf")
+        if p.name != "CerebroTwin_Project_Presentation.pdf"
+    ]
+    if user_pres_files:
+        for p in user_pres_files:
+            print(f"  [OK] Preserving existing manual presentation: {p.name} ({p.stat().st_size:,} bytes)")
     else:
-        print("\n❌ Some PDFs failed to generate. Check errors above.")
+        pres_path = DOCS_DIR / "CerebroTwin_Project_Presentation.pdf"
+        if not pres_path.exists():
+            build_presentation_pdf(pres_path)
+        else:
+            print(f"  [OK] Preserving existing presentation: {pres_path.name} ({pres_path.stat().st_size:,} bytes)")
+
+    # Verify architecture diagram exists
+    if arch_path.exists() and arch_path.stat().st_size > 0:
+        print(f"  [OK] Verified: {arch_path.name}  ({arch_path.stat().st_size:,} bytes)")
+        print("\nAll documentation verified successfully.")
+    else:
+        print(f"\n[FAIL] Architecture diagram failed to generate: {arch_path}")
         sys.exit(1)

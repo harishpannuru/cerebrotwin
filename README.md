@@ -2,7 +2,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://github.com/harishpannuru/cerebrotwin)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cerebrotwin-cxdos3it3cqlvhu6eftmtt.streamlit.app/)
+
+---
+
+## 🌐 Live Deployed Application (Streamlit Community Cloud)
+- **Live Interactive Clinician Dashboard:** [https://cerebrotwin-cxdos3it3cqlvhu6eftmtt.streamlit.app/](https://cerebrotwin-cxdos3it3cqlvhu6eftmtt.streamlit.app/)
+- **Primary Dataset Source (PhysioNet v1.0.1):** [https://physionet.org/content/cerebral-perfusion-diabetes/1.0.1/?utm_source=chatgpt.com](https://physionet.org/content/cerebral-perfusion-diabetes/1.0.1/?utm_source=chatgpt.com)
 
 ---
 
@@ -83,7 +89,7 @@ Current clinical monitoring relies primarily on systemic physiological signals (
 Both official project documents are located in the [`/docs`](./docs) directory and are fully publicly accessible without special permissions:
 
 - 📄 **Architecture Diagram (PDF):** [`docs/CerebroTwin_Architecture_Diagram.pdf`](./docs/CerebroTwin_Architecture_Diagram.pdf)
-- 📊 **Project Presentation Deck (PDF):** [`docs/CerebroTwin_Project_Presentation.pdf`](./docs/CerebroTwin_Project_Presentation.pdf)
+- 📊 **Project Presentation Deck (PDF):** [`docs/CerebroTwin — Physiological Digital Twin Presentation.pdf`](<./docs/CerebroTwin — Physiological Digital Twin Presentation.pdf>)
 
 ---
 
@@ -128,10 +134,11 @@ cerebrotwin/
 ├── test_pipeline.py                 # End-to-end pipeline tests
 ├── docs/
 │   ├── CerebroTwin_Architecture_Diagram.pdf
-│   └── CerebroTwin_Project_Presentation.pdf
+│   └── CerebroTwin — Physiological Digital Twin Presentation.pdf
 ├── scripts/
 │   ├── download_physionet_subset.py # PhysioNet data downloader
-│   └── generate_docs.py            # PDF generation script
+│   ├── generate_architecture.py     # Architecture diagram generator
+│   └── generate_docs.py            # PDF documentation pipeline
 ├── data/
 │   └── synthetic/                   # Synthetic training data
 │       ├── metadata.csv
