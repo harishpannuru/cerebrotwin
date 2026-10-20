@@ -89,7 +89,7 @@ Current clinical monitoring relies primarily on systemic physiological signals (
 Both official project documents are located in the [`/docs`](./docs) directory and are fully publicly accessible without special permissions:
 
 - 📄 **Architecture Diagram (PDF):** [`docs/CerebroTwin_Architecture_Diagram.pdf`](./docs/CerebroTwin_Architecture_Diagram.pdf)
-- 📊 - 📊 **Project Presentation Deck (PDF):** [`docs/CerebroTwin_Presentation_v3.pdf`](./docs/CerebroTwin_Presentation_v3.pdf)
+- 📊 **Project Presentation Deck (PDF):** [`docs/CerebroTwin_Presentation_v3.pdf`](./docs/CerebroTwin_Presentation_v3.pdf)
 ---
 
 ## 🎥 Demonstration Video (15–20 Minutes)
