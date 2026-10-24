@@ -94,7 +94,7 @@ Both official project documents are located in the [`/docs`](./docs) directory a
 
 ## 🎥 Demonstration Video (15–20 Minutes)
 
-- **Video Link:** `[DEMO VIDEO LINK - UNLISTED YOUTUBE URL PENDING UPLOAD]`
+- **Video Link:** [https://youtu.be/zlzcS3yc3mg](https://youtu.be/zlzcS3yc3mg)
 - *(A complete 15–20 minute walkthrough covering problem motivation, Digital Twin architecture, GroupKFold validation, live Streamlit patient replay, SHAP explainability, and counterfactual simulation will be linked here upon final render).*
 
 ---
